@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Casamento - Contagem Regressiva</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* Gradiente inspirado no céu da madrugada antes do amanhecer */
+            background: linear-gradient(180deg, #090d16 0%, #1a2238 45%, #3d345b 75%, #9d5c63 92%, #e09f7d 100%);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Estrelas / Partículas de fundo */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 0.9; transform: scale(1.2); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            width: 100%;
+            background: rgba(15, 20, 35, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 40px 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #f3c69f;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #fff, #f7d9b9, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .date-info {
+            font-size: 1.05rem;
+            color: #d0d7e8;
+            margin-bottom: 35px;
+            font-weight: 300;
+        }
+
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .time-box {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 20px 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .time-box:hover {
+            transform: translateY(-5px);
+            border-color: #f3c69f;
+        }
+
+        .number {
+            display: block;
+            font-family: 'Cinzel', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #f7d9b9;
+            line-height: 1.1;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #b8c2d8;
+            margin-top: 8px;
+            display: block;
+        }
+
+        /* Barra de progresso */
+        .progress-section {
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #d0d7e8;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #9d5c63, #f3c69f);
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        .love-note {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .heart {
+            color: #ff6b81;
+            display: inline-block;
+            animation: beat 1.2s infinite;
+        }
+
+        @keyframes beat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .countdown-grid { grid-template-columns: repeat(2, 1fr); }
+            .number { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <p class="subtitle">Contagem Regressiva</p>
+        <!-- Você pode colocar os nomes de vocês aqui abaixo -->
+        <h1 id="couple-names">Nosso Grande Dia</h1>
+        <p class="date-info">18 de Dezembro de 2027 • às 04:00 da manhã</p>
+
+        <div class="countdown-grid">
+            <div class="time-box">
+                <span class="number" id="days">000</span>
+                <span class="label">Dias</span>
+            </div>
+            <div class="time-box">
+                <span class="number" id="hours">00</span>
+                <span class="label">Horas</span>
+            </div>
+            <div class="time-box">
+                <span class="number" id="minutes">00</span>
+                <span class="label">Minutos</span>
+            </div>
+            <div class="time-box">
+                <span class="number" id="seconds">00</span>
+                <span class="label">Segundos</span>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-header">
+                <span>Nossa jornada até o altar</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="love-note">
+            <p id="days-together">Calculando nossa história...</p>
+            <p style="margin-top: 8px; font-style: italic; color: #f3c69f;">
+                "Antes mesmo do sol nascer, estaremos dizendo o nosso sim." <span class="heart">♥</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Data do casamento: 18 de Dezembro de 2027 às 04:00:00 (Horário de Brasília)
+        const weddingDate = new Date("2027-12-18T04:00:00-03:00").getTime();
+        
+        // Data de início do namoro: 11 de Julho de 2026
+        const startDate = new Date("2026-07-11T00:00:00-03:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+
+            if (distance < 0) {
+                document.querySelector(".countdown-grid").innerHTML = 
+                    "<h2 style='grid-column: 1/-1; color: #f7d9b9; font-family: Cinzel, serif;'>Chegou o nosso grande dia! 💍✨</h2>";
+                document.getElementById("progress-fill").style.width = "100%";
+                document.getElementById("progress-percent").innerText = "100%";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = String(days).padStart(3, '0');
+            document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+
+            // Cálculo da barra de progresso desde o início do namoro até o casamento
+            const totalJourney = weddingDate - startDate;
+            const elapsedJourney = now - startDate;
+            let percentage = (elapsedJourney / totalJourney) * 100;
+            percentage = Math.max(0, Math.min(100, percentage));
+
+            document.getElementById("progress-fill").style.width = percentage.toFixed(2) + "%";
+            document.getElementById("progress-percent").innerText = percentage.toFixed(1) + "%";
+
+            // Dias juntos
+            const daysTogether = Math.floor(elapsedJourney / (1000 * 60 * 60 * 24));
+            if (daysTogether >= 0) {
+                document.getElementById("days-together").innerHTML = 
+                    `Já são <strong>${daysTogether} dias</strong> caminhando juntos rumo ao altar.`;
+            }
+        }
+
+        // Gerar estrelas no fundo
+        // Gerar estrelas no fundo
+        function createStars() {
+            const starsContainer = document.getElementById("stars");
+            for (let i = 0; i < 60; i++) {
+                const star = document.createElement("div");
+                star.className = "star";
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + "px";
+                star.style.height = size + "px";
+                star.style.top = Math.random() * 70 + "%";
+                star.style.left = Math.random() * 100 + "%";
+                star.style.setProperty("--duration", (Math.random() * 3 + 2) + "s");
+                starsContainer.appendChild(star);
+            }
+        }
+
+        createStars();
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
